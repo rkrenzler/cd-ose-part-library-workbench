@@ -33,9 +33,9 @@ class OSE_PartLibraryWorkbench (Workbench):
     def Initialize(self):
         "This function is executed when FreeCAD starts"
         import OSEBasePartLibrary, OSE_CommandsPartLibrary # import here all the needed files that create your FreeCAD commands
-        self.list = ["OSE_CommandButton"] # A list of command names created in the line above
-        self.appendToolbar("OSE", self.list) # creates a new toolbar with your commands
-        self.appendMenu("Command Menu", self.list) # creates a new menu
+        self.list = OSE_CommandsPartLibrary.COMMAND_LIST # A list of command names created in the line above
+        self.appendToolbar("Part library", self.list) # creates a new toolbar with your commands
+        self.appendMenu("OSE Pipe Library", self.list) # creates a new menu
 
         #FreeCADGui.addIconPath(":/Resources/icons")
         #FreeCADGui.addLanguagePath(":/translations")

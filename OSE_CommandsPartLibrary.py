@@ -23,14 +23,15 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCAD, Part, OSEBase
+import FreeCAD, Part, OSEBasePartLibrary
 from FreeCAD import Gui
 
+COMMAND_LIST = ["OSE_CommandButton"]
 class OSE_CommandButtonClass():
     """Command to add the printer frame"""
 
     def GetResources(self):
-        return {'Pixmap'  : OSEBase.ICON_PATH + '/DrawStyleWireFrame.svg', # the name of a svg file available in the resources
+        return {'Pixmap'  : OSEBasePartLibrary.ICON_PATH + '/DrawStyleWireFrame.svg', # the name of a svg file available in the resources
                 'Accel' : "Shift+S", # a default shortcut (optional)
                 'MenuText': "Add a frame",
                 'ToolTip' : "Adds a D3D printer frame"}
