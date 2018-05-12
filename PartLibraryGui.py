@@ -141,6 +141,7 @@ class PartTableModel(QtCore.QAbstractTableModel):
             return self.headers[col]
         return None
 
+
 class DialogParams:
     def __init__(self):
         self.document = None
@@ -154,6 +155,7 @@ class DialogParams:
         self.selection_mode = False
         # Old style column name for the unique ID of the part.
         self.key_column_name = "Name"
+
 
 class BaseDialog(QtGui.QDialog):
     QSETTINGS_APPLICATION = "OSE part library workbench"
@@ -223,6 +225,7 @@ class BaseDialog(QtGui.QDialog):
         QtCore.QObject.connect(
             self.buttonBox, QtCore.SIGNAL("rejected()"), dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(dialog)
+        QtCore.QObject.connect(self.tableViewParts, QtCore.SIGNAL("clicked(QModelIndex)"), dialog.rows_selected)
 
     def retranslate_ui(self, dialog):
         dialog.setWindowTitle(QtGui.QApplication.translate(
@@ -307,6 +310,24 @@ class BaseDialog(QtGui.QDialog):
             return self.accept_selection_mode()
         else:
             self.accept_creation_mode()
+
+    def get_image_full_path(self, row):
+        if row is not None:
+            image = row["Image"]
+            if len(image) > 0:
+                path = os.path.join(OSEBasePartLibrary.PARTS_PATH, image)
+                if os.path.isfile(path):
+                    return path
+
+        return None  # File does not exists
+
+    def rows_selected(self):
+        #   FreeCAD.Console.PrintMessage("row selected")
+        path = self.get_image_full_path(self.get_selected_row())
+        if path is not None:
+            self.labelImage.setPixmap(path)
+        else:
+            self.labelImage.setPixmap("")  # No picture.
 
     def save_additional_data(self, settings):
         pass
