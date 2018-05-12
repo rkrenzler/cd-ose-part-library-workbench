@@ -25,16 +25,34 @@
 
 import FreeCAD, Part, OSEBasePartLibrary
 from FreeCAD import Gui
+import copy
 
-COMMAND_LIST = ["OSE_CommandButton"]
+COMMAND_TABLE = [
+ {"Command":"A", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_a.csv", "MenuText":"Command A",
+ 	"ToolTip":"This is a test command A",},
+ {"Command":"B", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_b.csv", "MenuText":"Command A",
+ 	"ToolTip":"This is a test command B"}
+ {"Command":"C", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_c.csv", "MenuText":"Command C",
+ 	"ToolTip":"This is a test command C"} 	
+]
+
+# Initalize command list. It is used in InitGui.py.
+COMMAND_LIST=[]
+
+for row in COMMAND_TABLE:
+	COMMAND_LIST.append(row["Command"])
+	
 class OSE_CommandButtonClass():
     """Command to add the printer frame"""
 
+    def __init__(self, row):
+        self.row = copy.deepcopy(row)
+
     def GetResources(self):
-        return {'Pixmap'  : OSEBasePartLibrary.ICON_PATH + '/DrawStyleWireFrame.svg', # the name of a svg file available in the resources
-                'Accel' : "Shift+S", # a default shortcut (optional)
-                'MenuText': "Add a frame",
-                'ToolTip' : "Adds a D3D printer frame"}
+        return {'Pixmap'  : OSEBasePartLibrary.ICON_PATH + '/'+self.row["ButtonImage"], # the name of a svg file available in the resources
+#                'Accel' : "Shift+S", # a default shortcut (optional)
+                'MenuText': self.row["ToolTip"],
+                'ToolTip' : self.row["ToolTip"]}
 
     def Activated(self):
         "Do something here when button is clicked"
@@ -56,4 +74,7 @@ class OSE_CommandButtonClass():
         are met or not. This function is optional."""
         return True
 
-Gui.addCommand('OSE_CommandButton', OSE_CommandButtonClass()) 
+# Add commands from the list
+
+for row in COMMAND_TABLE:
+	Gui.addCommand(row["Command"], OSE_CommandButtonClass(row)) 
