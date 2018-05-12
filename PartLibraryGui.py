@@ -1,16 +1,94 @@
 # -*- coding: utf-8 -*-
 # Author: Ruslan Krenzler.
 # Date: 12 Mai 2018
-# General classes for piping dialogs
+# Dialog to select a part.
 
 import os.path
+import csv
 
 from PySide import QtCore, QtGui
 import FreeCAD
 
 import OSEBasePartLibrary
-import piping
-import pipingGui
+
+
+class Error(Exception):
+    """Base class for exceptions in this module."""
+
+    def __init__(self, message):
+        super(Error, self).__init__(message)
+
+
+class CsvError(Error):
+    """Base class for exceptions in this module."""
+
+    def __init__(self, message):
+        super(Error, self).__init__(message)
+
+
+class CsvTable:
+    """ Read pipe dimensions from a csv file.
+    one part of the column must be unique and contains a unique key.
+
+    Store the data as a list of rows. Each row is a list of values.
+    """
+
+    def __init__(self, mandatory_dims=None, key_column_name="PartNumber"):
+        """
+        @param mandatoryDims: list of column names which must be presented in the CSV files apart
+        the "keyColumnName" column
+        """
+        self.headers = []
+        self.data = []
+        self.has_valid_data = False
+        if mandatory_dims is None:
+            mandatory_dims = []
+        self.mandatory_dims = mandatory_dims
+        self._key_column_name = key_column_name
+        self._key_column_index = None
+
+    def key_column_name(self):
+        return self._key_column_name
+
+    def load(self, filename):
+        """Load data from a CSV file."""
+        self.has_valid_data = False
+        with open(filename, "r") as csvfile:
+            csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            self.headers = csv_reader.next()
+            # Fill the talble
+            self.data = []
+            keys = []
+            self._key_column_index = self.headers.index(self._key_column_name)
+            for row in csv_reader:
+                # Check if the keys is unique
+                key = row[self._key_column_index]
+                if key in keys:
+                    msg = 'Error: Not unique key "%s" in column %s found in %s' % (
+                        key, self._key_column_name, filename)
+                    raise CsvError(msg)
+                else:
+                    keys.append(key)
+                self.data.append(row)
+            csvfile.close()  # Should I close this file explicitely?
+            self.has_valid_data = self.has_necessary_columns()
+
+    def has_necessary_columns(self):
+        """ Check if the data contains all the columns required to create a part."""
+        return all(h in self.headers for h in (self.mandatory_dims + [self._key_column_name]))
+
+    def find_part(self, key):
+        """Return first row with with key (part name) as a dictionary."""
+        # Search for the first appereance of the name in this column.
+        for row in self.data:
+            if row[self._key_column_index] == key:
+                # Convert row to dicionary.
+                return dict(zip(self.headers, row))
+        return None
+
+    def get_part_key(self, index):
+        """Return part key of a row with the index *index*."""
+        return self.data[index][self._key_column_index]
 
 
 class PartTableModel(QtCore.QAbstractTableModel):
@@ -21,41 +99,46 @@ class PartTableModel(QtCore.QAbstractTableModel):
         self.keyColumnName = None
         QtCore.QAbstractTableModel.__init__(self, parent, *args)
 
-    def row_count(self, parent):
+    def rowCount(self, parent):
         return len(self.table_data)
 
-        def column_count(self, parent):
-            return len(self.headers)
+    def columnCount(self, parent):
+        return len(self.headers)
 
-        def data(self, index, role):
-            if not index.isValid():
-                return None
-            elif role != QtCore.Qt.DisplayRole:
-                return None
-            return self.table_data[index.row()][index.column()]
-
-        def get_part_key(self, row_index):
-            key_index = self.headers.index(self.keyColumnName)
-            return self.table_data[row_index][key_index]
-
-        def get_part_row_index(self, key):
-            """ Return row index of the part with key *key*.
-
-            The *key* is usually refers to the part number.
-            :param key: Key of the part.
-            :return: Index of the first row whose key is equal to key
-                            return -1 if no row find.
-            """
-            key_index = self.headers.index(self.keyColumnName)
-            for row_i in range(key_index, len(self.table_data)):
-                if self.table_data[row_i][key_index] == key:
-                    return row_i
-            return -1
-
-        def header_data(self, col, orientation, role):
-            if orientation == QtCore. Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-                return self.headers[col]
+    def data(self, index, role):
+        if not index.isValid():
             return None
+        elif role != QtCore.Qt.DisplayRole:
+            return None
+        return self.table_data[index.row()][index.column()]
+
+    def get_part_key(self, row_index):
+        key_index = self.headers.index(self.keyColumnName)
+        return self.table_data[row_index][key_index]
+
+    def get_row(self, row_index):
+        values = self.table_data[row_index]
+        keys = self.headers
+        return dict(zip(keys, values))
+
+    def get_part_row_index(self, key):
+        """ Return row index of the part with key *key*.
+
+        The *key* is usually refers to the part number.
+        :param key: Key of the part.
+        :return: Index of the first row whose key is equal to key
+                        return -1 if no row find.
+        """
+        key_index = self.headers.index(self.keyColumnName)
+        for row_i in range(key_index, len(self.table_data)):
+            if self.table_data[row_i][key_index] == key:
+                return row_i
+        return -1
+
+    def header_data(self, col, orientation, role):
+        if orientation == QtCore. Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return self.headers[col]
+        return None
 
 
 class DialogParams:
@@ -72,9 +155,8 @@ class DialogParams:
         # Old style column name for the unique ID of the part.
         self.key_column_name = "Name"
 
-
 class BaseDialog(QtGui.QDialog):
-    QSETTINGS_APPLICATION = "OSE piping workbench"
+    QSETTINGS_APPLICATION = "OSE part library workbench"
 
     def __init__(self, params):
         super(BaseDialog, self).__init__()
@@ -150,7 +232,7 @@ class BaseDialog(QtGui.QDialog):
 
     def init_table(self):
         # Read table data from CSV
-        self.model = pipingGui.PartTableModel(
+        self.model = PartTableModel(
             self.params.table.headers, self.params.table.data)
         self.model.keyColumnName = self.params.key_column_name
         self.tableViewParts.setModel(self.model)
@@ -160,20 +242,28 @@ class BaseDialog(QtGui.QDialog):
         if sel.isSelected:
             if len(sel.selectedRows()) > 0:
                 row_index = sel.selectedRows()[0].row()
-                return self.model.getPartKey(row_index)
+                return self.model.get_part_key(row_index)
+        return None
+
+    def get_selected_row(self):
+        sel = self.tableViewParts.selectionModel()
+        if sel.isSelected:
+            if len(sel.selectedRows()) > 0:
+                row_index = sel.selectedRows()[0].row()
+                return self.model.get_row(row_index)
         return None
 
     def select_part_by_name(self, part_name):
         """Select first row with a part with a name partName."""
         if part_name is not None:
-            row_i = self.model.getPartRowIndex(part_name)
+            row_i = self.model.get_part_row_index(part_name)
             if row_i >= 0:
                 self.tableViewParts.selectRow(row_i)
 
-    def create_new_part(self, document, table, part_name):
-        """ This function must be implement by the parent class.
-
-        It must return a part if succees and None if fail."""
+    def create_new_part(self, document, row):
+        part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["FreeCAD"])
+#        print(part_path)
+#        import_part(part_path)
         pass
 
     def accept_creation_mode(self):
@@ -191,16 +281,10 @@ class BaseDialog(QtGui.QDialog):
             return
 
         # Get suitable row from the the table.
-        part_name = self.get_selected_part_name()
-
-        if part_name is not None:
-            part = self.create_new_part(
-                self.params.document, self.params.table, part_name)
-            if part is not None:
-                self.params.document.recompute()
-                # Save user input for the next dialog call.
-                self.saveInput()
-                # Call parent class.
+        row = self.get_selected_row()
+        if row is not None:
+                self.save_input()
+                self.create_new_part(self.params.document, row)
                 super(BaseDialog, self).accept()
 
         else:
@@ -220,7 +304,7 @@ class BaseDialog(QtGui.QDialog):
 
     def accept(self):
         if self.params.selection_mode:
-            return self.acceptSelectionMode()
+            return self.accept_selection_mode()
         else:
             self.accept_creation_mode()
 
@@ -232,7 +316,6 @@ class BaseDialog(QtGui.QDialog):
         settings = QtCore.QSettings(
             BaseDialog.QSETTINGS_APPLICATION, self.params.settings_name)
         settings.setValue("LastSelectedPartNumber", self.get_selected_part_name())
-        self.saveAdditionalData(settings)
         settings.sync()
 
     def restore_input(self):
@@ -264,7 +347,7 @@ class BaseDialog(QtGui.QDialog):
 
 # Before working with macros, try to load the dimension table.
 def gui_check_table(table_path):
-    dimensions_used = []
+    dimensions_used = ["PartNumber", "Text", "Image", "FreeCAD"]
     # Check if the CSV file exists.
     if os.path.isfile(table_path) is False:
         text = "This tablePath requires %s  but this file does not exist." % (
@@ -276,10 +359,10 @@ def gui_check_table(table_path):
 
     FreeCAD.Console.PrintMessage(
         "Trying to load CSV file with dimensions: %s" % table_path)
-    table = piping.CsvTable(dimensions_used)
+    table = CsvTable(dimensions_used)
     table.load(table_path)
 
-    if table.hasValidData is False:
+    if table.has_valid_data is False:
         text = 'Invalid %s.\n'\
             'It must contain columns %s.' % (
                 table_path, ", ".join(dimensions_used))
@@ -292,11 +375,11 @@ def gui_check_table(table_path):
 
 
 doc = FreeCAD.activeDocument()
-table_path = OSEBasePartLibrary.TABLE_PATH + "/table_a.csv"
+table_path = OSEBasePartLibrary.TABLE_PATH + "/table_d3d.csv"
 
 
 def show_dialog(row):
-    # Open a CSV file, check its content, and return it as a piping.CsvTable object.
+    # Open a CSV file, check its content, and return it as a CsvTable object.
     table = gui_check_table(table_path)
     if table is None:
         return  # Error

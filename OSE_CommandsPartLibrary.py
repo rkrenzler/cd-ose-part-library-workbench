@@ -11,7 +11,7 @@
 #*  modify it under the terms of the GNU Lesser General Public             *
 #*  License as published by the Free Software Foundation; either           *
 #*  version 2 of the License, or (at your option) any later version.       *
-#*                                                                         *            
+#*                                                                         *
 #*  This library is distributed in the hope that it will be useful,        *
 #*  but WITHOUT ANY WARRANTY; without even the implied warranty of         *
 #*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU      *
@@ -29,12 +29,8 @@ from FreeCAD import Gui
 import copy
 
 COMMAND_TABLE = [
- {"Command":"A", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_a.csv", "MenuText":"Command A",
- 	"ToolTip":"This is a test command A",},
- {"Command":"B", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_b.csv", "MenuText":"Command A",
- 	"ToolTip":"This is a test command B"},
- {"Command":"C", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_c.csv", "MenuText":"Command C",
- 	"ToolTip":"This is a test command C"} 	
+ {"Command":"A", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"table_d3d.csv", "MenuText":"Command A",
+ 	"ToolTip":"This is a test command A"},
 ]
 
 # Initalize command list. It is used in InitGui.py.
@@ -42,7 +38,7 @@ COMMAND_LIST=[]
 
 for row in COMMAND_TABLE:
 	COMMAND_LIST.append(row["Command"])
-	
+
 class ButtonCommand():
     """Command to add the printer frame"""
 
@@ -63,7 +59,7 @@ class ButtonCommand():
 #        view = Gui.activeDocument().activeView()
         doc=FreeCAD.activeDocument()
         n=list()
-        c = Part.Circle() 
+        c = Part.Circle()
         c.Radius=2.0
         f = doc.addObject("Part::Feature", "Circle") # create a document with a circle feature
         f.Shape = c.toShape() # Assign the circle shape to the shape property
@@ -78,4 +74,4 @@ class ButtonCommand():
 # Add commands from the list
 
 for row in COMMAND_TABLE:
-	Gui.addCommand(row["Command"], ButtonCommand(row)) 
+	Gui.addCommand(row["Command"], ButtonCommand(row))
