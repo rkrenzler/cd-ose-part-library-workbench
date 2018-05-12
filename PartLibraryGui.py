@@ -141,6 +141,62 @@ class PartTableModel(QtCore.QAbstractTableModel):
         return None
 
 
+class Proxy_importPart:
+    def execute(self, shape):
+        pass
+
+def importPart(filename):
+    doc_assembly = FreeCAD.ActiveDocument
+    FreeCAD.Console.PrintMessage("importing part from %s\n" % filename)
+
+    doc_already_open = filename in [
+        d.FileName for d in FreeCAD.listDocuments().values()]
+    FreeCAD.Console.PrintMessage("%s open already %s" %
+                             (filename, doc_already_open))
+
+    if doc_already_open:
+        doc = [d for d in FreeCAD.listDocuments().values() if d.FileName ==
+               filename][0]
+    else:
+        if filename.lower().endswith('.fcstd'):
+            FreeCAD.Console.PrintMessage('opening %s' % filename)
+            doc = FreeCAD.openDocument(filename)
+            FreeCAD.Console.PrintMessage('succesfully opened %s' % filename)
+        else:  # trying shaping import http://forum.freecadweb.org/viewtopic.php?f=22&t=12434&p=99772#p99772x
+            import ImportGui
+            doc = FreeCAD.newDocument(os.path.basename(filename))
+            shapeobj = ImportGui.insert(filename, doc.Name)
+
+    visibleObjects = [obj for obj in doc.Objects
+                      if hasattr(obj, 'ViewObject') and obj.ViewObject.isVisible()
+                      and hasattr(obj, 'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]  # len(obj.Shape.Faces) > 0 to avoid sketches, skip Body
+    FreeCAD.Console.PrintMessage('Visible objects %s' % visibleObjects)
+
+    obj = doc_assembly.addObject("Part::FeaturePython", 'part123456')
+    obj.addProperty("App::PropertyFile", "sourceFile",
+                    "D3D_ImportPart").sourceFile = filename
+    obj.addProperty("App::PropertyFloat", "timeLastImport", "D3D_ImportPart")
+    obj.setEditorMode("timeLastImport", 1)
+    obj.addProperty("App::PropertyBool", "fixedPosition", "D3D_ImportPart")
+    obj.fixedPosition = not any(
+        [i.fixedPosition for i in doc_assembly.Objects if hasattr(i, 'fixedPosition')])
+    #obj.addProperty("App::PropertyBool", "updateColors", "importPart").updateColors = True
+    obj_to_copy = visibleObjects[0]
+    obj.Shape = obj_to_copy.Shape.copy()
+
+    obj.Proxy = Proxy_importPart()
+    obj.timeLastImport = os.path.getmtime(filename)
+    # clean up
+    # if subAssemblyImport:
+    #    doc_assembly.removeObject(tempPartName)
+    if not doc_already_open:  # then close again
+        FreeCAD.closeDocument(doc.Name)
+        FreeCAD.setActiveDocument(doc_assembly.Name)
+        FreeCAD.ActiveDocument = doc_assembly
+    return obj
+
+
+
 class DialogParams:
     def __init__(self):
         self.document = None
@@ -263,7 +319,8 @@ class BaseDialog(QtGui.QDialog):
     def create_new_part(self, document, row):
         part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["FreeCAD"])
 #        print(part_path)
-#        import_part(part_path)
+        importPart(part_path)
+        document.recompute()
         pass
 
     def accept_creation_mode(self):
