@@ -77,10 +77,6 @@ class BaseDialog(QtGui.QDialog):
 		super(BaseDialog, self).__init__()
 		self.params = params
 		self.initUi()
-		if piping.HasFlamingoSupport():
-			self.radioButtonFlamingo.setEnabled(True)			
-		else:
-			self.radioButtonFlamingo.setEnabled(False)
 			
 	def initUi(self): 
 		Dialog = self # Added 
@@ -99,7 +95,7 @@ class BaseDialog(QtGui.QDialog):
 		self.show()
 
 # The following lines are from QtDesigner .ui-file processed by pyside-uic
-# pyside-uic --indent=0 create-coupling.ui -o tmp.py
+# pyside-uic --indent=0 add-part.ui -o tmp.py
 #
 # The file paths needs to be adjusted manually. For example
 # self.label.setPixmap(QtGui.QPixmap(GetMacroPath()+"coupling-dimensions.png"))
@@ -107,43 +103,19 @@ class BaseDialog(QtGui.QDialog):
 # access datata in some special FreeCAD directory.
 	def setupUi(self, Dialog):
 		Dialog.setObjectName("Dialog")
-		Dialog.resize(800, 733)
+		Dialog.resize(800, 800)
 		self.verticalLayout = QtGui.QVBoxLayout(Dialog)
 		self.verticalLayout.setObjectName("verticalLayout")
-		self.outputTypeWidget = QtGui.QWidget(Dialog)
-		self.outputTypeWidget.setMinimumSize(QtCore.QSize(0, 55))
-		self.outputTypeWidget.setLayoutDirection(QtCore.Qt.LeftToRight)
-		self.outputTypeWidget.setObjectName("outputTypeWidget")
-		self.groupBox = QtGui.QGroupBox(self.outputTypeWidget)
-		self.groupBox.setGeometry(QtCore.QRect(10, 0, 263, 58))
-		self.groupBox.setObjectName("groupBox")
-		self.horizontalLayout = QtGui.QHBoxLayout(self.groupBox)
-		self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-		self.horizontalLayout.setObjectName("horizontalLayout")
-		self.radioButtonSolid = QtGui.QRadioButton(self.groupBox)
-		self.radioButtonSolid.setEnabled(True)
-		self.radioButtonSolid.setChecked(True)
-		self.radioButtonSolid.setObjectName("radioButtonSolid")
-		self.horizontalLayout.addWidget(self.radioButtonSolid)
-		self.radioButtonFlamingo = QtGui.QRadioButton(self.groupBox)
-		self.radioButtonFlamingo.setEnabled(False)
-		self.radioButtonFlamingo.setChecked(False)
-		self.radioButtonFlamingo.setObjectName("radioButtonFlamingo")
-		self.horizontalLayout.addWidget(self.radioButtonFlamingo)
-		self.radioButtonParts = QtGui.QRadioButton(self.groupBox)
-		self.radioButtonParts.setObjectName("radioButtonParts")
-		self.horizontalLayout.addWidget(self.radioButtonParts)
-		self.verticalLayout.addWidget(self.outputTypeWidget)
 		self.tableViewParts = QtGui.QTableView(Dialog)
 		self.tableViewParts.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 		self.tableViewParts.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 		self.tableViewParts.setObjectName("tableViewParts")
 		self.verticalLayout.addWidget(self.tableViewParts)
-		self.labelExplanation = QtGui.QLabel(Dialog)
-		self.labelExplanation.setTextFormat(QtCore.Qt.AutoText)
-		self.labelExplanation.setWordWrap(True)
-		self.labelExplanation.setObjectName("labelExplanation")
-		self.verticalLayout.addWidget(self.labelExplanation)
+		self.labelText = QtGui.QLabel(Dialog)
+		self.labelText.setTextFormat(QtCore.Qt.AutoText)
+		self.labelText.setWordWrap(True)
+		self.labelText.setObjectName("labelText")
+		self.verticalLayout.addWidget(self.labelText)
 		self.labelImage = QtGui.QLabel(Dialog)
 		self.labelImage.setText("")
 		self.labelImage.setPixmap(os.path.join(OSEBasePartLibrary.IMAGE_PATH, self.params.dimensionsPixmap))
@@ -163,11 +135,7 @@ class BaseDialog(QtGui.QDialog):
 
 	def retranslateUi(self, Dialog):
 		Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", self.params.dialogTitle, None, QtGui.QApplication.UnicodeUTF8))
-		self.groupBox.setTitle(QtGui.QApplication.translate("Dialog", "Output type:", None, QtGui.QApplication.UnicodeUTF8))
-		self.radioButtonSolid.setText(QtGui.QApplication.translate("Dialog", "Solid", None, QtGui.QApplication.UnicodeUTF8))
-		self.radioButtonFlamingo.setText(QtGui.QApplication.translate("Dialog", "Flamingo", None, QtGui.QApplication.UnicodeUTF8))
-		self.radioButtonParts.setText(QtGui.QApplication.translate("Dialog", "Parts", None, QtGui.QApplication.UnicodeUTF8))
-		self.labelExplanation.setText(QtGui.QApplication.translate("Dialog", self.params.explanationText, None, QtGui.QApplication.UnicodeUTF8))
+		self.labelText.setText(QtGui.QApplication.translate("Dialog", self.params.explanationText, None, QtGui.QApplication.UnicodeUTF8))
 
 	def initTable(self):
 		# Read table data from CSV
@@ -190,7 +158,7 @@ class BaseDialog(QtGui.QDialog):
 			if row_i >= 0:
 				self.tableViewParts.selectRow(row_i)
 
-	def createNewPart(self, document, table, partName, outputType):
+	def createNewPart(self, document, table, partName):
 		""" This function must be implement by the parent class.
 		
 		It must return a part if succees and None if fail."""
@@ -213,8 +181,7 @@ class BaseDialog(QtGui.QDialog):
 		partName = self.getSelectedPartName()
 
 		if partName is not None:
-			outputType = self.getOutputType()
-			part = self.createNewPart(self.params.document, self.params.table, partName, outputType)
+			part = self.createNewPart(self.params.document, self.params.table, partName)
 			if part is not None:
 				self.params.document.recompute()
 				# Save user input for the next dialog call.
@@ -249,14 +216,6 @@ class BaseDialog(QtGui.QDialog):
 	def saveInput(self):
 		"""Store user input for the next run."""
 		settings = QtCore.QSettings(BaseDialog.QSETTINGS_APPLICATION, self.params.settingsName)
-
-		if self.radioButtonFlamingo.isChecked():
-			settings.setValue("radioButtonsOutputType", piping.OUTPUT_TYPE_FLAMINGO)
-		elif self.radioButtonParts.isChecked():
-			settings.setValue("radioButtonsOutputType", piping.OUTPUT_TYPE_PARTS)
-		else : # Default is solid.
-			settings.setValue("radioButtonsOutputType", piping.OUTPUT_TYPE_SOLID)
-
 		settings.setValue("LastSelectedPartNumber", self.getSelectedPartName())
 		self.saveAdditionalData(settings)		
 		settings.sync()
@@ -266,25 +225,8 @@ class BaseDialog(QtGui.QDialog):
 
 	def restoreInput(self):
 		settings = QtCore.QSettings(BaseDialog.QSETTINGS_APPLICATION, self.params.settingsName)
-		
-		output = int(settings.value("radioButtonsOutputType", piping.OUTPUT_TYPE_SOLID))
-		if output == piping.OUTPUT_TYPE_FLAMINGO and piping.HasFlamingoSupport():
-			self.radioButtonFlamingo.setChecked(True)			
-		elif  output == piping.OUTPUT_TYPE_PARTS:
-			self.radioButtonParts.setChecked(True)
-		else: # Default is solid. output == piping.OUTPUT_TYPE_SOLID
-			self.radioButtonSolid.setChecked(True)
-
 		self.selectPartByName(settings.value("LastSelectedPartNumber"))
 		self.restoreAdditionalInput(settings)
-
-	def getOutputType(self):
-		if self.radioButtonFlamingo.isChecked():
-			return piping.OUTPUT_TYPE_FLAMINGO
-		elif self.radioButtonParts.isChecked():
-			return piping.OUTPUT_TYPE_PARTS
-		else: # Default is solid.
-			return piping.OUTPUT_TYPE_SOLID
 
 	def showForSelection(self, partName=None):
 		""" Show pipe dialog, to select pipe and not to create it.
@@ -346,10 +288,10 @@ def show_dialog(row):
 	params = DialogParams()
 	params.document = document
 	params.table = table
-	params.dialogTitle = "Create Coupling"
-	params.fittingType = "Coupling"
+	params.dialogTitle = "Insert Part"
+	params.fittingType = "Part"
 	params.dimensionsPixmap = "coupling-dimensions.png"
-	params.explanationText = "<html><head/><body><p>To construct a coupling we use these dimensions, elbow only these dimensions are used: alpha, L, N,  M, M1, POD, POD1, PThk, and PThk1. In Additinon, Flamingo uses the Schedule dimension if it is present in the table. All other dimensions are used for inromation only. </p></body></html>"
+	params.explanationText = "Exmlanation Text"
 	params.settingsName = "coupling user input"
 	params.keyColumnName = "PartNumber"
 	form = BaseDialog(params)
