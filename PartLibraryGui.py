@@ -148,8 +148,6 @@ class DialogParams:
         self.table = None
         self.dialog_title = None
         self.selection_dialog_title = None
-        self.fitting_type = None  # Elbow, Tee, Coupling etc..
-        self.dimensions_pixmap = None
         self.explanation_text = None
         self.settings_name = None
         self.selection_mode = False
@@ -184,10 +182,6 @@ class BaseDialog(QtGui.QDialog):
 # The following lines are from QtDesigner .ui-file processed by pyside-uic
 # pyside-uic --indent=0 add-part.ui -o tmp.py
 #
-# The file paths needs to be adjusted manually. For example
-# self.label.setPixmap(QtGui.QPixmap(GetMacroPath()+"coupling-dimensions.png"))
-# os.path.join(OSEBasePartLibrary.IMAGE_PATH, self.params.dimensions_pixmap)
-# access datata in some special FreeCAD directory.
     def setup_ui(self, dialog):
         dialog.setObjectName("Dialog")
         dialog.resize(800, 800)
@@ -207,8 +201,7 @@ class BaseDialog(QtGui.QDialog):
         self.verticalLayout.addWidget(self.labelText)
         self.labelImage = QtGui.QLabel(dialog)
         self.labelImage.setText("")
-        self.labelImage.setPixmap(os.path.join(
-            OSEBasePartLibrary.IMAGE_PATH, self.params.dimensions_pixmap))
+        self.labelImage.setPixmap("")
         self.labelImage.setAlignment(QtCore.Qt.AlignCenter)
         self.labelImage.setObjectName("labelImage")
         self.verticalLayout.addWidget(self.labelImage)
@@ -230,8 +223,6 @@ class BaseDialog(QtGui.QDialog):
     def retranslate_ui(self, dialog):
         dialog.setWindowTitle(QtGui.QApplication.translate(
             "Dialog", self.params.dialog_title, None, QtGui.QApplication.UnicodeUTF8))
-        self.labelText.setText(QtGui.QApplication.translate(
-            "Dialog", self.params.explanation_text, None, QtGui.QApplication.UnicodeUTF8))
 
     def init_table(self):
         # Read table data from CSV
@@ -266,7 +257,6 @@ class BaseDialog(QtGui.QDialog):
     def create_new_part(self, document, row):
         part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["FreeCAD"])
         importPart.importPart(part_path)
-        document.recompute()
         pass
 
     def accept_creation_mode(self):
@@ -323,14 +313,15 @@ class BaseDialog(QtGui.QDialog):
 
     def rows_selected(self):
         #   FreeCAD.Console.PrintMessage("row selected")
-        path = self.get_image_full_path(self.get_selected_row())
+        row = self.get_selected_row()
+        path = self.get_image_full_path(row)
         if path is not None:
             self.labelImage.setPixmap(path)
         else:
             self.labelImage.setPixmap("")  # No picture.
 
-    def save_additional_data(self, settings):
-        pass
+        # update text
+        self.labelText.setText(row["Text"])
 
     def save_input(self):
         """Store user input for the next run."""
@@ -411,8 +402,6 @@ def show_dialog(row):
     params.table = table
     params.dialogTitle = "Insert Part"
     params.fittingType = "Part"
-    params.dimensions_pixmap = "coupling-dimensions.png"
-    params.explanation_text = "Exmlanation Text"
     params.settings_name = "coupling user input"
     params.key_column_name = "PartNumber"
     form = BaseDialog(params)
