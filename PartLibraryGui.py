@@ -256,7 +256,7 @@ class BaseDialog(QtGui.QDialog):
 
     def create_new_part(self, document, row):
         part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["FreeCAD"])
-        importPart.importPart(part_path)
+        importPart.importPart(part_path, row["PartNumber"], document)
         pass
 
     def accept_creation_mode(self):
