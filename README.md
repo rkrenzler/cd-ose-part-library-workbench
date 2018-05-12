@@ -1,7 +1,6 @@
-# FreeCAD_Workbench_Starter
-Example for getting a basic FreeCAD workbench started
+# OSE part library
 
-[Python Style Guide](https://www.python.org/dev/peps/pep-0008/)
+This workbench helps to have fast a access to different FreeCAD files.
 
 
 ## Installation
@@ -12,13 +11,5 @@ Example for getting a basic FreeCAD workbench started
 ````
 $ mkdir ~/.FreeCAD/Mod
 $ cd ~/.FreeCAD/Mod
-$ git clone https://github.com/skaiser/FreeCAD_Workbench_Starter.git
+$ git clone https://github.com/rkrenzler/ose-part-library.git
 ````
-
-Create a soft link in your home directory to make it easier to add things like icons from the file browser windows.
-
-````
-$ cd
-$ ln -s ~/.FreeCAD/Mod/ .
-````
-
