@@ -4,6 +4,7 @@
 #*                                                                         *
 #*                                                                         *
 #*  Copyright (C) 2017                                                     *
+#*  Ruslan Krenzler                                                        *
 #*  Stephen Kaiser <freesol29@gmail.com>                                   *
 #*                                                                         *
 #*  This library is free software; you can redistribute it and/or          *
@@ -31,7 +32,7 @@ COMMAND_TABLE = [
  {"Command":"A", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_a.csv", "MenuText":"Command A",
  	"ToolTip":"This is a test command A",},
  {"Command":"B", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_b.csv", "MenuText":"Command A",
- 	"ToolTip":"This is a test command B"}
+ 	"ToolTip":"This is a test command B"},
  {"Command":"C", "ButtonImage":"DrawStyleWireFrame.svg", "Csv":"test_c.csv", "MenuText":"Command C",
  	"ToolTip":"This is a test command C"} 	
 ]
@@ -42,7 +43,7 @@ COMMAND_LIST=[]
 for row in COMMAND_TABLE:
 	COMMAND_LIST.append(row["Command"])
 	
-class OSE_CommandButtonClass():
+class ButtonCommand():
     """Command to add the printer frame"""
 
     def __init__(self, row):
@@ -51,7 +52,7 @@ class OSE_CommandButtonClass():
     def GetResources(self):
         return {'Pixmap'  : OSEBasePartLibrary.ICON_PATH + '/'+self.row["ButtonImage"], # the name of a svg file available in the resources
 #                'Accel' : "Shift+S", # a default shortcut (optional)
-                'MenuText': self.row["ToolTip"],
+                'MenuText': self.row["MenuText"],
                 'ToolTip' : self.row["ToolTip"]}
 
     def Activated(self):
@@ -77,4 +78,4 @@ class OSE_CommandButtonClass():
 # Add commands from the list
 
 for row in COMMAND_TABLE:
-	Gui.addCommand(row["Command"], OSE_CommandButtonClass(row)) 
+	Gui.addCommand(row["Command"], ButtonCommand(row)) 
