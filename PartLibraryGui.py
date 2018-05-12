@@ -136,7 +136,7 @@ class PartTableModel(QtCore.QAbstractTableModel):
                 return row_i
         return -1
 
-    def header_data(self, col, orientation, role):
+    def headerData(self, col, orientation, role):
         if orientation == QtCore. Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             return self.headers[col]
         return None
@@ -255,7 +255,7 @@ class BaseDialog(QtGui.QDialog):
                 self.tableViewParts.selectRow(row_i)
 
     def create_new_part(self, document, row):
-        part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["FreeCAD"])
+        part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["Cad"])
         importPart.importPart(part_path, row["PartNumber"], document)
         pass
 
@@ -359,7 +359,7 @@ class BaseDialog(QtGui.QDialog):
 
 # Before working with macros, try to load the dimension table.
 def gui_check_table(table_path):
-    dimensions_used = ["PartNumber", "Text", "Image", "FreeCAD"]
+    dimensions_used = ["PartNumber", "Text", "Image", "Cad"]
     # Check if the CSV file exists.
     if os.path.isfile(table_path) is False:
         text = "This tablePath requires %s  but this file does not exist." % (
@@ -386,16 +386,18 @@ def gui_check_table(table_path):
     return table
 
 
-doc = FreeCAD.activeDocument()
-table_path = OSEBasePartLibrary.TABLE_PATH + "/table_d3d.csv"
+def test_module():
+    doc = FreeCAD.activeDocument()
+    table_path = OSEBasePartLibrary.TABLE_PATH + "/table_d3d.csv"
+    show_dialog(doc, table_path)
 
 
-def show_dialog(row):
-    # Open a CSV file, check its content, and return it as a CsvTable object.
+def show_dialog(document, table_path):
+    print("Show dialog for table %s"%table_path)
     table = gui_check_table(table_path)
     if table is None:
         return  # Error
-    document = FreeCAD.activeDocument()
+#    document = FreeCAD.activeDocument()
 
     params = DialogParams()
     params.document = document
@@ -408,4 +410,4 @@ def show_dialog(row):
     form.exec_()
 
 
-show_dialog(None)
+#show_dialog(None)
