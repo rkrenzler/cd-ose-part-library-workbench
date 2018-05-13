@@ -385,28 +385,10 @@ def gui_check_table(table_path):
     return table
 
 
-def test_module():
-    doc = FreeCAD.activeDocument()
-    table_path = Base.TABLE_PATH + "/table_d3d.csv"
-    show_dialog(doc, table_path)
+#def test_module():
+#    doc = FreeCAD.activeDocument()
+#    table_path = Base.TABLE_PATH + "/table_d3d.csv"
+#    show_dialog(doc, table_path)
 
 
-def show_dialog(document, table_path):
-    print("Show dialog for table %s"%table_path)
-    table = gui_check_table(table_path)
-    if table is None:
-        return  # Error
-#    document = FreeCAD.activeDocument()
-
-    params = DialogParams()
-    params.document = document
-    params.table = table
-    params.dialogTitle = "Insert Part"
-    params.fittingType = "Part"
-    params.settings_name = "coupling user input"
-    params.key_column_name = "PartNumber"
-    form = BaseDialog(params)
-    form.exec_()
-
-
-#show_dialog(None)
+#test_module(None)

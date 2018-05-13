@@ -1,0 +1,13 @@
+PartNumber,Text,Image,Cad
+flatplate24,,basis-set/flachprofile/images/flatplate24.png,basis-set/flachprofile/flatplate24.fcstd
+flatplate48,,basis-set/flachprofile/images/flatplate48.png,basis-set/flachprofile/flatplate48.fcstd
+flatplate56,,basis-set/flachprofile/images/flatplate56.png,basis-set/flachprofile/flatplate56.fcstd
+flatplate32,,basis-set/flachprofile/images/flatplate32.png,basis-set/flachprofile/flatplate32.fcstd
+flatplate12,,basis-set/flachprofile/images/flatplate12.png,basis-set/flachprofile/flatplate12.fcstd
+flatplate64,,basis-set/flachprofile/images/flatplate64.png,basis-set/flachprofile/flatplate64.fcstd
+flatplate8,,basis-set/flachprofile/images/flatplate8.png,basis-set/flachprofile/flatplate8.fcstd
+flatplate16,,basis-set/flachprofile/images/flatplate16.png,basis-set/flachprofile/flatplate16.fcstd
+flatplate4,,basis-set/flachprofile/images/flatplate4.png,basis-set/flachprofile/flatplate4.fcstd
+flatplate6,,basis-set/flachprofile/images/flatplate6.png,basis-set/flachprofile/flatplate6.fcstd
+flatplate40,,basis-set/flachprofile/images/flatplate40.png,basis-set/flachprofile/flatplate40.fcstd
+all_flatplates,,basis-set/flachprofile/images/all_flatplates.png,basis-set/flachprofile/all_flatplates.fcstd

@@ -40,23 +40,45 @@ import OSE_PartLibraryGui as PartLibraryGui
 
 COMMAND_TABLE = [
     {"Command": "A", "ButtonImage": "DrawStyleWireFrame.svg", "Csv": "table_d3d.csv", "MenuText": "Command A",
+	 "Title":"Insert a Part",
      "ToolTip": "This is a test command A"},
-    {"Command": "flachprofil", "ButtonImage": "DrawStyleWireFrame.svg",
-     "Csv": "flachprofil.csv",
+    {"Command": "boxset", "ButtonImage": "DrawStyleWireFrame.svg",
+     "Csv": "boxset.csv",
+	 "Title":"Insert a part from box set",
+     "MenuText": "Add Boxset", "ToolTip": ""},
+
+    {"Command": "AddFlachprofil", "ButtonImage": "DrawStyleWireFrame.svg",
+	 "Title":"Insert a Flachprofil",
+     "Csv": "flachprofile.csv",
      "MenuText": "Add Flachprofil", "ToolTip": ""},
-    {"Command": "Add L-Verbinder", "ButtonImage": "DrawStyleWireFrame.svg",
-     "Csv": "l-verbinder.csv",
-     "MenuText": "Add L-Verbinder", "ToolTip": ""},
-    {"Command": "Add Mutter", "ButtonImage": "DrawStyleWireFrame.svg",
-     "Csv": "muttern.csv",
-     "MenuText": "Add Mutter", "ToolTip": ""},
-    {"Command": "Add T-Slot", "ButtonImage": "DrawStyleWireFrame.svg",
-     "Csv": "tslot.csv",
-     "MenuText": "Add T-Slot", "ToolTip": ""},
-    {"Command": "Add T-Verbinder", "ButtonImage": "DrawStyleWireFrame.svg",
-     "Csv": "t-verbinder.csv",
-     "MenuText": "Add T-Verbinder", "ToolTip": ""},
+
+    {"Command": "AddLframeset", "ButtonImage": "DrawStyleWireFrame.svg",
+     "Csv": "lframeset.csv",
+	 "Title":"Insert Lframeset",
+     "MenuText": "Add Lframeset", "ToolTip": ""},
+
+    {"Command": "AddLibresolarbox", "ButtonImage": "DrawStyleWireFrame.svg",
+	 "Title":"Insert Libresolarbox",
+     "Csv": "libresolarbox.csv",
+     "MenuText": "Add Libresolarbox", "ToolTip": ""},
+
+    {"Command": "AddSchraubenmutter", "ButtonImage": "DrawStyleWireFrame.svg",
+	 "Title":"Insert a Schraubenmutter",
+     "Csv": "schraubenmuttern.csv",
+     "MenuText": "Add Schraubenmutter", "ToolTip": ""},
+
+    {"Command": "AddTslotprofil", "ButtonImage": "DrawStyleWireFrame.svg",
+	 "Title":"Insert a T-Slot profil",
+     "Csv": "tslotprofile.csv",
+     "MenuText": "Add T-Slotprofil", "ToolTip": ""},
+
+    {"Command": "AddVerbinder", "ButtonImage": "DrawStyleWireFrame.svg",
+	 "Title":"Insert a Verbinder",
+     "Csv": "verbinder.csv",
+     "MenuText": "Add Verbinder", "ToolTip": ""},
+
     {"Command": "Add Winkel", "ButtonImage": "DrawStyleWireFrame.svg",
+	 "Title":"Insert a Winkel",
      "Csv": "winkel.csv",
      "MenuText": "Add Winkel", "ToolTip": ""},
 ]
@@ -90,13 +112,31 @@ class ButtonCommand():
             FreeCAD.newDocument()
 #        view = Gui.activeDocument().activeView()
         doc = FreeCAD.activeDocument()
-        table_path = os.path.join(Base.TABLE_PATH, self.row["Csv"])
-        PartLibraryGui.show_dialog(doc, table_path)
+        self.show_dialog(doc, row)
 
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional."""
         return True
+
+    def show_dialog(self, document, row):
+        table_path = os.path.join(Base.TABLE_PATH, self.row["Csv"])
+        print("Show dialog for table %s" % table_path)
+        table = PartLibraryGui.gui_check_table(table_path)
+        if table is None:
+            return  # Error
+        #    document = FreeCAD.activeDocument()
+
+        params = PartLibraryGui.DialogParams()
+        params.document = document
+        params.table = table
+        params.dialogTitle = row["Title"]
+        # Use the same name for settings as for the table.
+        params.settings_name = row["Csv"]
+        params.key_column_name = "PartNumber"
+        form = PartLibraryGui.BaseDialog(params)
+        form.exec_()
+
 
 
 # Add commands from the list

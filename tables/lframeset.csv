@@ -1,0 +1,8 @@
+PartNumber,Text,Image,Cad
+cornerjig,,basis-set/frameset/images/cornerjig.png,basis-set/frameset/cornerjig.fcstd
+shell_corner10n_xrot,,basis-set/frameset/images/shell_corner10n_xrot.png,basis-set/frameset/shell_corner10n_xrot.fcstd
+cornerjig_base,,basis-set/frameset/images/cornerjig_base.png,basis-set/frameset/cornerjig_base.fcstd
+endkappe1d,,basis-set/frameset/images/endkappe1d.png,basis-set/frameset/endkappe1d.fcstd
+shell_3dcorner8g,,basis-set/frameset/images/shell_3dcorner8g.png,basis-set/frameset/shell_3dcorner8g.fcstd
+myhinge5c,,basis-set/frameset/images/myhinge5c.png,basis-set/frameset/myhinge5c.fcstd
+dreieck1h,,basis-set/frameset/images/dreieck1h.png,basis-set/frameset/dreieck1h.fcstd
