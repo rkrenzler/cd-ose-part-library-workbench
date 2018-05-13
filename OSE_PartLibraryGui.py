@@ -9,8 +9,7 @@ import csv
 from PySide import QtCore, QtGui
 import FreeCAD
 import importPart
-
-import OSEBasePartLibrary
+import OSE_BasePartLibrary as Base
 
 
 class Error(Exception):
@@ -255,7 +254,7 @@ class BaseDialog(QtGui.QDialog):
                 self.tableViewParts.selectRow(row_i)
 
     def create_new_part(self, document, row):
-        part_path = os.path.join(OSEBasePartLibrary.PARTS_PATH, row["Cad"])
+        part_path = os.path.join(Base.PARTS_PATH, row["Cad"])
         importPart.importPart(part_path, row["PartNumber"], document)
         pass
 
@@ -305,7 +304,7 @@ class BaseDialog(QtGui.QDialog):
         if row is not None:
             image = row["Image"]
             if len(image) > 0:
-                path = os.path.join(OSEBasePartLibrary.PARTS_PATH, image)
+                path = os.path.join(Base.PARTS_PATH, image)
                 if os.path.isfile(path):
                     return path
 
@@ -388,7 +387,7 @@ def gui_check_table(table_path):
 
 def test_module():
     doc = FreeCAD.activeDocument()
-    table_path = OSEBasePartLibrary.TABLE_PATH + "/table_d3d.csv"
+    table_path = Base.TABLE_PATH + "/table_d3d.csv"
     show_dialog(doc, table_path)
 
 

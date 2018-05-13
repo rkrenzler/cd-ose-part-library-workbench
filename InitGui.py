@@ -11,7 +11,7 @@
 #*  modify it under the terms of the GNU Lesser General Public             *
 #*  License as published by the Free Software Foundation; either           *
 #*  version 2 of the License, or (at your option) any later version.       *
-#*                                                                         *            
+#*                                                                         *
 #*  This library is distributed in the hope that it will be useful,        *
 #*  but WITHOUT ANY WARRANTY; without even the implied warranty of         *
 #*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU      *
@@ -33,10 +33,10 @@ class OSE_PartLibraryWorkbench (Workbench):
 
     def Initialize(self):
         "This function is executed when FreeCAD starts"
-        import OSEBasePartLibrary, OSE_CommandsPartLibrary # import here all the needed files that create your FreeCAD commands
+        import OSE_BasePartLibrary, OSE_CommandsPartLibrary # import here all the needed files that create your FreeCAD commands
         self.list = OSE_CommandsPartLibrary.COMMAND_LIST # A list of command names created in the line above
         self.appendToolbar("Part library", self.list) # creates a new toolbar with your commands
-        self.appendMenu("OSE Pipe Library", self.list) # creates a new menu
+        self.appendMenu("OSE Part Library", self.list) # creates a new menu
 
         #FreeCADGui.addIconPath(":/Resources/icons")
         #FreeCADGui.addLanguagePath(":/translations")
@@ -57,8 +57,8 @@ class OSE_PartLibraryWorkbench (Workbench):
         # "recipient" will be either "view" or "tree"
         self.appendContextMenu("D3D commands", self.list) # add commands to the context menu
 
-    def GetClassName(self): 
+    def GetClassName(self):
         # this function is mandatory if this is a full python workbench
         return "Gui::PythonWorkbench"
-       
+
 Gui.addWorkbench(OSE_PartLibraryWorkbench())
