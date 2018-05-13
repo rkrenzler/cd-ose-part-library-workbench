@@ -255,7 +255,8 @@ class BaseDialog(QtGui.QDialog):
 
     def create_new_part(self, document, row):
         part_path = os.path.join(Base.PARTS_PATH, row["Cad"])
-        importPart.importPart(part_path, row["PartNumber"], document)
+        importPart.importPart(part_path, None, document)
+        document.recompute()
         pass
 
     def accept_creation_mode(self):
