@@ -112,7 +112,7 @@ class ButtonCommand():
             FreeCAD.newDocument()
 #        view = Gui.activeDocument().activeView()
         doc = FreeCAD.activeDocument()
-        self.show_dialog(doc, row)
+        self.show_dialog(doc, self.row)
 
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions
@@ -120,8 +120,7 @@ class ButtonCommand():
         return True
 
     def show_dialog(self, document, row):
-        table_path = os.path.join(Base.TABLE_PATH, self.row["Csv"])
-        print("Show dialog for table %s" % table_path)
+        table_path = os.path.join(Base.TABLE_PATH, row["Csv"])
         table = PartLibraryGui.gui_check_table(table_path)
         if table is None:
             return  # Error

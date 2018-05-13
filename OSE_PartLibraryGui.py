@@ -171,7 +171,7 @@ class BaseDialog(QtGui.QDialog):
         # Restore previous user input. Ignore exceptions to prevent this part
         # part of the code to prevent GUI from starting, once settings are broken.
         try:
-            self.restore_input()
+            self.restore_user_input()
         except Exception as e:
             print("Could not restore old user input!")
             print(e)
@@ -276,7 +276,7 @@ class BaseDialog(QtGui.QDialog):
         # Get suitable row from the the table.
         row = self.get_selected_row()
         if row is not None:
-                self.save_input()
+                self.save_user_input()
                 self.create_new_part(self.params.document, row)
                 super(BaseDialog, self).accept()
 
@@ -323,17 +323,19 @@ class BaseDialog(QtGui.QDialog):
         # update text
         self.labelText.setText(row["Text"])
 
-    def save_input(self):
+    def save_user_input(self):
         """Store user input for the next run."""
         settings = QtCore.QSettings(
             BaseDialog.QSETTINGS_APPLICATION, self.params.settings_name)
         settings.setValue("LastSelectedPartNumber", self.get_selected_part_name())
         settings.sync()
 
-    def restore_input(self):
+    def restore_user_input(self):
         settings = QtCore.QSettings(
             BaseDialog.QSETTINGS_APPLICATION, self.params.settings_name)
         self.select_part_by_name(settings.value("LastSelectedPartNumber"))
+        # Update part table_data
+        self.rows_selected()
 
     def show_for_selection(self, part_name=None):
         """ Show pipe dialog, to select pipe and not to create it.
