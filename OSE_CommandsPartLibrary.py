@@ -47,7 +47,7 @@ COMMAND_TABLE = [
 	 "Title":"Insert a part from box set",
      "MenuText": "Add Boxset", "ToolTip": ""},
 
-    {"Command": "AddFlachprofil", "ButtonImage": "DrawStyleWireFrame.svg",
+    {"Command": "AddFlachprofil", "ButtonImage": "flachprofile.png",
 	 "Title":"Insert a Flachprofil",
      "Csv": "flachprofile.csv",
      "MenuText": "Add Flachprofil", "ToolTip": ""},
@@ -62,22 +62,22 @@ COMMAND_TABLE = [
      "Csv": "libresolarbox.csv",
      "MenuText": "Add Libresolarbox", "ToolTip": ""},
 
-    {"Command": "AddSchraubenmutter", "ButtonImage": "DrawStyleWireFrame.svg",
+    {"Command": "AddSchraubenmutter", "ButtonImage": "nut.png",
 	 "Title":"Insert a Schraubenmutter",
      "Csv": "schraubenmuttern.csv",
      "MenuText": "Add Schraubenmutter", "ToolTip": ""},
 
-    {"Command": "AddTslotprofil", "ButtonImage": "DrawStyleWireFrame.svg",
+    {"Command": "AddTslotprofil", "ButtonImage": "tslot.png",
 	 "Title":"Insert a T-Slot profil",
      "Csv": "tslotprofile.csv",
      "MenuText": "Add T-Slotprofil", "ToolTip": ""},
 
-    {"Command": "AddVerbinder", "ButtonImage": "DrawStyleWireFrame.svg",
+    {"Command": "AddVerbinder", "ButtonImage": "verbinder.png",
 	 "Title":"Insert a Verbinder",
      "Csv": "verbinder.csv",
      "MenuText": "Add Verbinder", "ToolTip": ""},
 
-    {"Command": "Add Winkel", "ButtonImage": "DrawStyleWireFrame.svg",
+    {"Command": "Add Winkel", "ButtonImage": "angle.png",
 	 "Title":"Insert a Winkel",
      "Csv": "winkel.csv",
      "MenuText": "Add Winkel", "ToolTip": ""},
