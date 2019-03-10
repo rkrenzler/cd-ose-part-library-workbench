@@ -2,7 +2,9 @@
 
 This workbench helps to have fast a access to different FreeCAD files.
 
-**Warning: this code does not work. At this point it is only a proof of conceptcts and a test of available technologies.**
+**Warning: this code does not work with QT5.**
+
+**Warning: this code is in very early alpha state. At this point it is only a proof of conceptcts and a test of available technologies.**
 
 ## Problems
 * I do not know the magic behind the import function. It seems to work on FreeCAD 0.17 with Assembly 2. But the code curses in red font into the *Report view*.
