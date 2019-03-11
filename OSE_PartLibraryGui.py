@@ -154,6 +154,19 @@ class DialogParams:
         self.key_column_name = "Name"
 
 
+def UnicodeUTF8():
+    """Return UnicodeUTF8 if it is defined or 0 otherwise.
+
+    The old FreeCAD code for Qt4 uses enum QtGui.QApplication.UnicodeUTF8
+    but it is not defined for new Qt5. With Qt5 we must to use 0 instead.
+    """
+
+    if hasattr(QtGui.QApplication, "UnicodeUTF8"):
+        QtGui.QApplication.UnicodeUTF8
+    else:
+        return 0
+
+
 class BaseDialog(QtGui.QDialog):
     QSETTINGS_APPLICATION = "OSE part library workbench"
 
@@ -221,7 +234,7 @@ class BaseDialog(QtGui.QDialog):
 
     def retranslate_ui(self, dialog):
         dialog.setWindowTitle(QtGui.QApplication.translate(
-            "Dialog", self.params.dialog_title, None, QtGui.QApplication.UnicodeUTF8))
+            "Dialog", self.params.dialog_title, None, UnicodeUTF8()))
 
     def init_table(self):
         # Read table data from CSV
@@ -345,7 +358,7 @@ class BaseDialog(QtGui.QDialog):
         # If required select
         self.params.selection_mode = True
         self.setWindowTitle(QtGui.QApplication.translate("Dialog", self.params.selection_dialog_title,
-                                                         None, QtGui.QApplication.UnicodeUTF8))
+                                                         None, UnicodeUTF8()))
         self.selected_part = None
         if part_name is not None:
             self.select_part_by_name(part_name)
@@ -355,7 +368,7 @@ class BaseDialog(QtGui.QDialog):
     def show_for_creation(self):
         self.params.selection_mode = False
         self.setWindowTitle(QtGui.QApplication.translate("Dialog", self.params.dialog_title,
-                                                         None, QtGui.QApplication.UnicodeUTF8))
+                                                         None, UnicodeUTF8()))
         self.exec_()
 
 
